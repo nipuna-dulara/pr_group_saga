@@ -12,7 +12,7 @@ device = (
 
 
 batch_size = 32
-learning_rate = 0.003
+learning_rate = 0.001
 epochs = 10
 num_classes = 5  
 data_dir = "defungi"  
@@ -23,7 +23,7 @@ data_dir = "defungi"
 #     transforms.ToTensor()
 # ])
 transform = transforms.Compose([
-    transforms.Resize((224, 224)),
+    transforms.Resize((128, 128)),
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(10),
     transforms.ToTensor()
@@ -45,12 +45,30 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
 
+# class SimpleCNN(nn.Module):
+#     def __init__(self, num_classes):
+#         super(SimpleCNN, self).__init__()
+#         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+#         self.pool = nn.MaxPool2d(2, 2)
+#         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+#         self.fc1 = nn.Linear(64 * 16 * 16, 128)
+#         self.fc2 = nn.Linear(128, num_classes)
+#         self.dropout = nn.Dropout(0.5)
+
+#     def forward(self, x):
+#         x = self.pool(torch.relu(self.conv1(x)))
+#         x = self.pool(torch.relu(self.conv2(x)))
+#         x = x.view(-1, 64 * 16 * 16)  # Flatten
+#         x = torch.relu(self.fc1(x))
+#         x = self.dropout(x)
+#         x = self.fc2(x)
+#         return x
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes):
         super(SimpleCNN, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=5, padding=1)
         self.dropout = nn.Dropout(0.5)
         
         # Temporary forward pass to calculate the flattened feature size after pooling
@@ -63,7 +81,7 @@ class SimpleCNN(nn.Module):
     def calculate_flattened_size(self):
         # Send a dummy input through the layers to calculate the flattened output size
         with torch.no_grad():
-            x = torch.zeros(1, 3, 224, 224)  # Assuming input image size of 224x224
+            x = torch.zeros(1, 3, 128, 128)  # Assuming input image size of 224x224
             x = self.pool(torch.relu(self.conv1(x)))
             x = self.pool(torch.relu(self.conv2(x)))
             self._to_linear = x.numel()
@@ -76,7 +94,6 @@ class SimpleCNN(nn.Module):
         x = self.dropout(x)
         x = self.fc2(x)
         return x
-
 
 
 model = SimpleCNN(num_classes=num_classes).to(device)
