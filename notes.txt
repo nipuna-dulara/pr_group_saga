@@ -1,0 +1,10 @@
+    # transforms.RandomHorizontalFlip(),
+    # transforms.RandomRotation(10), wasn't good because it seems that the data images are in the same direction. 
+    dropout 0.3
+    size 64x64
+    filter 3x3
+
+batch_size = 32
+learning_rate = 0.001
+epochs = 15
+num_classes = 5 
